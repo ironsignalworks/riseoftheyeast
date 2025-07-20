@@ -1,0 +1,105 @@
+Perfect choice. **"Rise of the Yeast"** is catchy, thematic, and hilarious. Below is your **game concept document** with full flavor and game flow based on the tower defense protocol you liked:
+
+---
+
+## 🎮 **Game Title:**
+
+## **Rise of the Yeast**
+
+**Genre:**
+🍞 Tower Defense / Resource Management
+
+**Style:**
+🥬 2D Cartoon Aesthetic – think microbial *Plants vs. Zombies* meets *Adventure Time*.
+
+**Tone:**
+🦠 Whimsical, pun-heavy, mildly gross (but cute).
+
+---
+
+## 🧠 **Core Concept:**
+
+The fermented are rising. Yeast colonies must defend the kitchen ecosystem from an outbreak of moldy mutants, bad bacteria, and rogue fungi. Defend your turf—*from countertop to cryo-chamber*—in this chaotic microbial turf war.
+
+---
+
+## 🧪 **Core Mechanics:**
+
+### 🧂 **Resources:**
+
+* **Sugar Crystals**: Dropped over time or produced by *Sugar Shroomers*.
+* Used to place defenders (ferments/yeast units).
+
+### 🛡️ **Defenders (Fermented Allies):**
+
+Each has a cost, cooldown, and special trait.
+
+| Unit Name                   | Type        | Ability                                     |
+| --------------------------- | ----------- | ------------------------------------------- |
+| **Baker’s Buddy**           | Basic Yeast | Basic short-range bubble attack (CO₂ blast) |
+| **Sourdough Starter Squad** | Area Buff   | Boosts adjacent yeast speed                 |
+| **Kombucha Blaster**        | Ranged      | Shoots acid bursts at long range            |
+| **Kimchi Catapult**         | AOE         | Lobs spicy jars that explode on impact      |
+| **Tempeh Tank**             | Tank        | Soaks up damage with firm tofu armor        |
+| **Miso Mortar**             | Splash      | Delayed-fire fermentation bombs             |
+
+### 🧟 **Enemies (Spoilage Horde):**
+
+Progressively harder and weirder.
+
+| Enemy Name           | Traits                    |
+| -------------------- | ------------------------- |
+| **Green Mold Blob**  | Basic slow crawler        |
+| **Black Sporestorm** | Speeds up when hit        |
+| **Pickle Leech**     | Steals defender buffs     |
+| **The Ferment Fail** | Leaves toxin puddles      |
+| **The Contaminator** | Boss – corrupts defenders |
+
+---
+
+## 📍 **Game Loop / Progression:**
+
+### **Stage 1: Kitchen Counter**
+
+* Tutorial Levels
+* Learn sugar collection and placement
+* Unlock 3 base units
+* First boss: *Tupperware Terror*
+
+### **Stage 2: Fridge Invasion**
+
+* New cold-resistant enemies
+* Ice hazard (slippery lanes)
+* Units: *Fridge Fungi Flamethrower*, *Chili Kimchi Shield*
+
+### **Stage 3: Wild Ferment Lab**
+
+* Rogue microbes and mutations
+* Environmental events: Spoilage Surges, Gas Leaks
+* Final boss: *The Mold Overlord*
+
+---
+
+## 💥 **Special Features:**
+
+* **Ferment-o-Pedia**: Unlock facts about real microbes as you progress.
+* **Daily Dough Missions**: Get extra sugar crystals by completing daily challenges.
+* **PvP Kitchen Duels** (Stretch Goal): Compete by building decks of defenders/mutators.
+
+---
+
+## 🎯 **Tagline Ideas:**
+
+* **"The yeast shall rise!"**
+
+---
+
+Let me know if you'd like:
+
+* Art direction mockups or ideas
+* A mock App Store / Steam page
+* Sample unit stats
+* Character dialogue/voice lines (yeast with attitude?)
+* Trailer script or pitch deck slide copy
+
+We can take this all the way.

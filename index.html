@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rise of the Yeast - Final</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      border: 2px solid #333;
+      background: url("kitchen.jpg") no-repeat center center;
+      background-size: cover;
+    }
+    #overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 10;
+    }
+    #overlay button {
+      font-size: 20px;
+      padding: 10px 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay">
+  <div id="message">
+    <h2>Rise of the Yeast</h2>
+    <p>Stop the mold invasion!</p>
+    <ul>
+      <li>Collect sugar over time</li>
+      <li>Press <b>1</b> for Baker, <b>2</b> for Kombucha</li>
+      <li>Click a tile to place a defender</li>
+      <li>Defenders will attack incoming mold</li>
+      <li>Survive until the kitchen is purified!</li>
+    </ul>
+  </div>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<canvas id="gameCanvas" width="900" height="550"></canvas>
+
+<!-- Background Music -->
+<audio id="bgMusic1" src="music2.mp3" loop></audio>
+<audio id="bgMusic2" src="music.mp3" loop></audio>
+
+<!-- Sound Effects -->
+<audio id="placeSound" src="place.wav" preload="auto"></audio>
+<audio id="attackSound" src="attack.mp3" preload="auto"></audio>
+<audio id="deathSound" src="death.wav" preload="auto"></audio>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const COLS = 9;
+const ROWS = 5;
+const TILE_SIZE = 100;
+const TOP_BAR_HEIGHT = 50;
+
+let sugar = 50;
+let lives = 10;
+let progress = 0;
+let gameOver = false;
+let victory = false;
+let gameStarted = false;
+
+const defenders = [];
+const enemies = [];
+let lastEnemySpawn = 0;
+const defenderTypes = ["Baker", "Kombucha"];
+let selectedDefender = 0;
+
+const overlay = document.getElementById("overlay");
+const placeSound = document.getElementById("placeSound");
+const attackSound = document.getElementById("attackSound");
+const deathSound = document.getElementById("deathSound");
+const bgMusic1 = document.getElementById("bgMusic1");
+const bgMusic2 = document.getElementById("bgMusic2");
+
+const images = {
+  Baker: new Image(),
+  Kombucha: new Image(),
+  Mold: new Image(),
+};
+
+images.Baker.src = "baker.jpg";
+images.Kombucha.src = "kombucha.jpg";
+images.Mold.src = "mold.jpg";
+
+let imagesLoaded = 0;
+const totalImages = Object.keys(images).length;
+for (let key in images) {
+  images[key].onload = () => {
+    imagesLoaded++;
+  };
+}
+
+function startGame() {
+  overlay.style.display = "none";
+  resetGame();
+  gameStarted = true;
+  bgMusic1.play();
+  bgMusic2.play();
+  requestAnimationFrame(gameLoop);
+}
+
+function drawGrid() {
+  ctx.strokeStyle = "#fff";
+  for (let i = 0; i < COLS; i++) {
+    for (let j = 0; j < ROWS; j++) {
+      ctx.strokeRect(i * TILE_SIZE, j * TILE_SIZE + TOP_BAR_HEIGHT, TILE_SIZE, TILE_SIZE);
+    }
+  }
+}
+
+function drawHUD() {
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, canvas.width, TOP_BAR_HEIGHT);
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "16px sans-serif";
+  ctx.fillText("Sugar: " + sugar, 10, 20);
+  ctx.fillText("Lives: " + lives, 100, 20);
+  ctx.fillText("1: Baker | 2: Kombucha | Click to place", 220, 20);
+
+  ctx.fillStyle = "#444";
+  ctx.fillRect(600, 10, 200, 20);
+  ctx.fillStyle = "#ffeb3b";
+  ctx.fillRect(600, 10, 200 * (progress / 200), 20);
+  ctx.strokeStyle = "#fff";
+  ctx.strokeRect(600, 10, 200, 20);
+  ctx.fillStyle = "#fff";
+  ctx.fillText("Yeast Purification", 620, 25);
+}
+
+canvas.addEventListener("click", (e) => {
+  if (!gameStarted || gameOver || victory) return;
+  const x = Math.floor(e.offsetX / TILE_SIZE);
+  const y = Math.floor((e.offsetY - TOP_BAR_HEIGHT) / TILE_SIZE);
+  if (y < 0) return;
+
+  const cost = 20;
+  if (sugar >= cost && !defenders.find(d => d.x === x && d.y === y)) {
+    defenders.push({ x, y, type: defenderTypes[selectedDefender], hp: 100, cooldown: 0 });
+    sugar -= cost;
+    placeSound.currentTime = 0;
+    placeSound.play();
+  }
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "1") selectedDefender = 0;
+  if (e.key === "2") selectedDefender = 1;
+});
+
+function spawnEnemy() {
+  if (Date.now() - lastEnemySpawn > 2500) {
+    const y = Math.floor(Math.random() * ROWS);
+    enemies.push({ x: COLS, y, hp: 100, speed: 0.005 });
+    lastEnemySpawn = Date.now();
+  }
+}
+
+function updateEnemies(dt) {
+  for (const e of enemies) {
+    e.x -= e.speed * dt;
+  }
+}
+
+function updateDefenders(dt) {
+  for (const d of defenders) {
+    d.cooldown -= dt;
+    for (const e of enemies) {
+      if (Math.floor(e.x) === d.x && e.y === d.y && d.cooldown <= 0) {
+        e.hp -= 20;
+        d.cooldown = 1000;
+        attackSound.currentTime = 0;
+        attackSound.play();
+      }
+    }
+  }
+}
+
+function cleanUp() {
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    if (enemies[i].hp <= 0) {
+      deathSound.currentTime = 0;
+      deathSound.play();
+      enemies.splice(i, 1);
+      progress += 5;
+      if (progress >= 200) {
+        showOverlay("Victory!");
+        victory = true;
+      }
+    } else if (enemies[i].x < 0) {
+      enemies.splice(i, 1);
+      lives--;
+      if (lives <= 0) {
+        showOverlay("Game Over");
+        gameOver = true;
+      }
+    }
+  }
+}
+
+function drawUnits() {
+  for (const d of defenders) {
+    const px = d.x * TILE_SIZE;
+    const py = d.y * TILE_SIZE + TOP_BAR_HEIGHT;
+    ctx.drawImage(images[d.type], px + 10, py + 10, 80, 50);
+    ctx.fillStyle = "#0f0";
+    ctx.fillRect(px + 10, py + 5, d.hp * 0.6, 5);
+  }
+
+  for (const e of enemies) {
+    const px = e.x * TILE_SIZE;
+    const py = e.y * TILE_SIZE + TOP_BAR_HEIGHT;
+    ctx.drawImage(images.Mold, px + 20, py + 10, 60, 40);
+    ctx.fillStyle = "#f00";
+    ctx.fillRect(px + 20, py + 5, e.hp * 0.6, 5);
+  }
+}
+
+function showOverlay(msg) {
+  overlay.style.display = "flex";
+  document.getElementById("message").innerHTML = "<h2>" + msg + "</h2>";
+  gameStarted = false;
+  bgMusic1.pause();
+  bgMusic2.pause();
+}
+
+function resetGame() {
+  sugar = 50;
+  lives = 10;
+  progress = 0;
+  defenders.length = 0;
+  enemies.length = 0;
+  lastEnemySpawn = 0;
+  gameOver = false;
+  victory = false;
+  bgMusic1.currentTime = 0;
+  bgMusic2.currentTime = 0;
+}
+
+function gameLoop() {
+  if (!gameStarted || gameOver || victory) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawGrid();
+  drawHUD();
+  spawnEnemy();
+  updateEnemies(16);
+  updateDefenders(16);
+  cleanUp();
+  drawUnits();
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Passive sugar generation
+setInterval(() => {
+  if (!gameOver && !victory && gameStarted) sugar += 5;
+}, 1000);
+</script>
+</body>
+</html>
